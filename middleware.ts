@@ -1,36 +1,31 @@
-import { NextResponse } from "next/server";
-import type { NextRequest } from "next/server";
-
-const SESSION_COOKIE = "session_token";
-const PROTECTED_ROUTES = ["/dashboard"];
-const AUTH_ONLY_ROUTES = ["/login"];
+import { NextResponse } from 'next/server';
+import type { NextRequest } from 'next/server';
 
 export function middleware(request: NextRequest) {
+  // Get token from cookies
+  const token = request.cookies.get('auth_token')?.value;
   const { pathname } = request.nextUrl;
-  const token = request.cookies.get(SESSION_COOKIE)?.value;
-
-  const isProtectedRoute = PROTECTED_ROUTES.some((route) =>
-    pathname.startsWith(route)
-  );
-  const isAuthOnlyRoute = AUTH_ONLY_ROUTES.some((route) =>
-    pathname.startsWith(route)
-  );
-
-  // No session, trying to reach a protected page -> bounce to /login
-  if (isProtectedRoute && !token) {
-    const loginUrl = new URL("/login", request.url);
-    loginUrl.searchParams.set("from", pathname);
+  
+  // Public paths that don't require authentication
+  const publicPaths = ['/login'];
+  const isPublicPath = publicPaths.includes(pathname);
+  
+  // If trying to access protected route without token
+  if (!isPublicPath && !token) {
+    const loginUrl = new URL('/login', request.url);
     return NextResponse.redirect(loginUrl);
   }
-
-  // Already signed in, trying to reach /login -> send to dashboard
-  if (isAuthOnlyRoute && token) {
-    return NextResponse.redirect(new URL("/dashboard", request.url));
+  
+  // If trying to access login with token, redirect to dashboard
+  if (isPublicPath && token) {
+    const dashboardUrl = new URL('/dashboard', request.url);
+    return NextResponse.redirect(dashboardUrl);
   }
-
+  
   return NextResponse.next();
 }
 
+// Configure which routes to run middleware on
 export const config = {
-  matcher: ["/dashboard/:path*", "/login"],
+  matcher: ['/((?!api|_next/static|_next/image|favicon.ico).*)'],
 };

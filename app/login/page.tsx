@@ -1,178 +1,149 @@
-"use client";
+'use client';
 
-import { useState, type FormEvent } from "react";
-import { useRouter } from "next/navigation";
-import { Mail, Lock, Eye, EyeOff, User } from "lucide-react";
+import { useState, FormEvent } from 'react';
+import { useRouter } from 'next/navigation';
+import { AuthService } from '@/lib/services';
+import { LoginCredentials } from '@/lib/types';
 
-export default function CoachLoginPage() {
+export default function LoginPage() {
   const router = useRouter();
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [showPassword, setShowPassword] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const [credentials, setCredentials] = useState<LoginCredentials>({
+    email: '',
+    password: '',
+  });
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const authService = AuthService.getInstance();
 
-  async function handleSubmit(event: FormEvent<HTMLFormElement>) {
-    event.preventDefault();
-    setError(null);
+  const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
     setLoading(true);
+    setError(null);
 
     try {
-      const res = await fetch("/api/auth/login", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, password }),
-      });
-
-      const data = await res.json();
-
-      if (!res.ok) {
-        throw new Error(data?.message ?? "Unable to sign in");
-      }
-
-      router.push("/dashboard");
-      router.refresh();
+      const userData = await authService.login(credentials);
+      console.log('Login successful:', userData);
+      router.push('/dashboard');
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Unable to sign in");
+      let errorMessage = 'An error occurred';
+      if (err instanceof Error) {
+        errorMessage = err.message;
+        if (errorMessage.includes('non-JSON')) {
+          errorMessage = 'Backend server is not responding properly. Please check if the backend is running on port 4000.';
+        } else if (errorMessage.includes('Failed to fetch')) {
+          errorMessage = 'Cannot connect to the server. Please make sure the backend is running on http://localhost:4000';
+        }
+      }
+      setError(errorMessage);
     } finally {
       setLoading(false);
     }
-  }
+  };
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setCredentials({
+      ...credentials,
+      [e.target.name]: e.target.value,
+    });
+  };
 
   return (
-    <main className="grid min-h-screen grid-cols-1 bg-black lg:grid-cols-2">
-      {/* Left: brand panel */}
-      <section className="relative hidden flex-col justify-between overflow-hidden bg-gradient-to-br from-[#0B1C3D] to-[#0A1730] p-12 lg:flex">
-        <div
-          className="pointer-events-none absolute inset-0 opacity-[0.15]"
-          style={{
-            backgroundImage:
-              "radial-gradient(circle, rgba(255,255,255,0.4) 1px, transparent 1px)",
-            backgroundSize: "18px 18px",
-          }}
-        />
-
-        <div className="relative">
-          <div className="flex items-center gap-2.5">
-            <div>
-              <p className="text-[48px] font-bold leading-tight text-white">Upstep Academy</p>
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-100 p-4">
+      <div className="w-full max-w-md">
+        <div className="bg-white rounded-2xl shadow-xl p-8 space-y-6">
+          {/* Logo/Brand */}
+          <div className="text-center">
+            <div className="w-16 h-16 bg-gradient-to-r from-blue-500 to-indigo-600 rounded-full flex items-center justify-center mx-auto mb-4">
+              <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4" />
+              </svg>
             </div>
+            <h2 className="text-3xl font-bold text-gray-900">Welcome Back</h2>
+            <p className="text-gray-600 mt-2">Sign in to continue to your dashboard</p>
           </div>
 
-          <h1 className="mt-10 text-4xl font-bold leading-tight text-white">
-            Welcome Back,
-            <br />
-            <span className="text-[#4C82FB]">Coach!</span>
-          </h1>
-          <div className="mt-3 h-1 w-14 rounded-full bg-[#4C82FB]" />
-          <p className="mt-20 max-w-sm text-lg leading-relaxed text-white/60">
-            Log in to your account to manage students, track progress and
-            continue your coaching journey.
-          </p>
-        </div>
-
-        <div className="relative h-40" />
-      </section>
-
-      {/* Right: form */}
-      <section className="flex items-center justify-center bg-black px-6 py-12 lg:bg-[#F4F6FA]">
-        <div className="w-full max-w-md rounded-2xl bg-white p-10 shadow-xl">
-          <div className="flex flex-col items-center">
-            <div className="flex h-16 w-16 items-center justify-center rounded-full bg-[#EAF0FE]">
-              <User className="h-8 w-8 text-[#4C82FB]" strokeWidth={1.75} />
+          {/* Error Message */}
+          {error && (
+            <div className="bg-red-50 border-l-4 border-red-500 p-4 rounded">
+              <div className="flex">
+                <div className="flex-shrink-0">
+                  <svg className="h-5 w-5 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                </div>
+                <div className="ml-3">
+                  <p className="text-sm text-red-700 whitespace-pre-wrap">{error}</p>
+                </div>
+              </div>
             </div>
-            <h2 className="mt-4 text-2xl font-bold text-gray-900">
-              Coach Login
-            </h2>
-          </div>
+          )}
 
-          <form onSubmit={handleSubmit} className="mt-7 space-y-5">
+          {/* Login Form */}
+          <form onSubmit={handleSubmit} className="space-y-5">
             <div>
-              <label
-                htmlFor="email"
-                className="mb-1.5 block text-sm font-semibold text-gray-800"
-              >
+              <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
                 Email Address
               </label>
-              <div className="relative">
-                <Mail className="pointer-events-none absolute left-3.5 top-1/2 h-4.5 w-4.5 -translate-y-1/2 text-gray-400" />
-                <input
-                  id="email"
-                  type="email"
-                  required
-                  autoComplete="email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  placeholder="Enter your email"
-                  className="w-full rounded-lg border border-gray-200 bg-white py-3 pl-11 pr-3.5 text-sm text-gray-900 outline-none transition-colors placeholder:text-gray-400 focus:border-[#4C82FB] focus:ring-2 focus:ring-[#4C82FB]/20"
-                />
-              </div>
+              <input
+                id="email"
+                name="email"
+                type="email"
+                required
+                value={credentials.email}
+                onChange={handleChange}
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-200"
+                placeholder="Enter your email"
+                disabled={loading}
+              />
             </div>
 
             <div>
-              <label
-                htmlFor="password"
-                className="mb-1.5 block text-sm font-semibold text-gray-800"
-              >
+              <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-1">
                 Password
               </label>
-              <div className="relative">
-                <Lock className="pointer-events-none absolute left-3.5 top-1/2 h-4.5 w-4.5 -translate-y-1/2 text-gray-400" />
-                <input
-                  id="password"
-                  type={showPassword ? "text" : "password"}
-                  required
-                  autoComplete="current-password"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  placeholder="Enter your password"
-                  className="w-full rounded-lg border border-gray-200 bg-white py-3 pl-11 pr-11 text-sm text-gray-900 outline-none transition-colors placeholder:text-gray-400 focus:border-[#4C82FB] focus:ring-2 focus:ring-[#4C82FB]/20"
-                />
-                <button
-                  type="button"
-                  onClick={() => setShowPassword((s) => !s)}
-                  className="absolute right-3.5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
-                  aria-label={showPassword ? "Hide password" : "Show password"}
-                >
-                  {showPassword ? (
-                    <EyeOff className="h-4.5 w-4.5" />
-                  ) : (
-                    <Eye className="h-4.5 w-4.5" />
-                  )}
-                </button>
-              </div>
+              <input
+                id="password"
+                name="password"
+                type="password"
+                required
+                value={credentials.password}
+                onChange={handleChange}
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-200"
+                placeholder="Enter your password"
+                disabled={loading}
+              />
             </div>
-
-            <div className="flex justify-end">
-              <a
-                href="/forgot-password"
-                className="text-sm font-medium text-[#4C82FB] hover:underline"
-              >
-                Forgot Password?
-              </a>
-            </div>
-
-            {error && (
-              <div
-                role="alert"
-                className="rounded-lg border border-red-200 bg-red-50 px-3.5 py-2.5 text-sm text-red-700"
-              >
-                {error}
-              </div>
-            )}
 
             <button
               type="submit"
               disabled={loading}
-              className="w-full rounded-lg bg-[#3D6AE2] px-4 py-3 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-[#3559C4] disabled:cursor-not-allowed disabled:opacity-60"
+              className={`w-full py-3 px-4 rounded-lg text-white font-semibold transition duration-200 ${
+                loading
+                  ? 'bg-gray-400 cursor-not-allowed'
+                  : 'bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700 transform hover:scale-[1.02]'
+              }`}
             >
-              {loading ? "Logging in…" : "Log In"}
+              {loading ? (
+                <div className="flex items-center justify-center">
+                  <svg className="animate-spin h-5 w-5 mr-3 text-white" fill="none" viewBox="0 0 24 24">
+                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+                  </svg>
+                  Signing in...
+                </div>
+              ) : (
+                'Sign In'
+              )}
             </button>
           </form>
 
-         
+          {/* Footer */}
+          <div className="text-center text-sm text-gray-600">
+            <p>Demo: pratik.test.123@yopmail.com</p>
+            <p>Password: C3EOC9CMVN</p>
+          </div>
         </div>
-      </section>
-    </main>
+      </div>
+    </div>
   );
 }
