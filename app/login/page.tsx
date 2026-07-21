@@ -138,10 +138,10 @@ export default function LoginPage() {
           </form>
 
           {/* Footer */}
-          <div className="text-center text-sm text-gray-600">
+          {/* <div className="text-center text-sm text-gray-600">
             <p>Demo: pratik.test.123@yopmail.com</p>
             <p>Password: C3EOC9CMVN</p>
-          </div>
+          </div> */}
         </div>
       </div>
     </div>
