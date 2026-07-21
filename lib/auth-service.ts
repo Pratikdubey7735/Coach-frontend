@@ -1,32 +1,49 @@
-import { api } from "./api";
-
-export interface LoginPayload {
-  email: string;
-  password: string;
-}
-
 export interface AuthUser {
-  id: string;
-  name: string;
+  userName: string;
+  userId: string;
   email: string;
-  role?: string;
+  employeeType: string;
+  coachLevel: string;
 }
 
-export interface LoginResponse {
-  token: string;
-  user: AuthUser;
+function mapApiUserToAuthUser(apiData: any): AuthUser {
+  return {
+    userName: apiData.userName,
+    userId: apiData.userId,
+    email: apiData.email,
+    employeeType: apiData.EmployeeType,
+    coachLevel: apiData.coachLevel,
+  };
 }
 
-/**
- * Talks to the Node.js backend's auth endpoints.
- * Adjust the paths below (`/auth/login`, `/auth/me`) to match your
- * actual backend routes.
- */
 export const authService = {
-  login: (payload: LoginPayload) =>
-    api.post<LoginResponse>("/auth/login", payload),
+  async login(email: string, password: string) {
+    const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/auth/login`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ email, password }),
+    });
 
-  me: (token: string) => api.get<AuthUser>("/auth/me", { token }),
+    const data = await res.json();
 
-  logout: (token: string) => api.post<void>("/auth/logout", undefined, { token }),
+    if (!res.ok || !data.success) {
+      throw new Error(data?.message ?? "Unable to sign in");
+    }
+
+    return {
+      user: mapApiUserToAuthUser(data),
+      token: data.token ?? data.userId, // replace with whatever your API actually returns as the session token
+    };
+  },
+
+  async me(token: string): Promise<AuthUser | null> {
+    const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/auth/me`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+
+    if (!res.ok) return null;
+
+    const data = await res.json();
+    return mapApiUserToAuthUser(data);
+  },
 };

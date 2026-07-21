@@ -8,7 +8,6 @@ import {
   GraduationCap,
   LogOut,
   Bell,
-//   Menu,
   X,
   ChevronDown,
   Clock,
@@ -17,12 +16,6 @@ import {
 const navItems = [
   { label: "Dashboard", icon: LayoutDashboard, active: true },
   { label: "My Classes", icon: GraduationCap, active: false },
-];
-
-const quickOverview = [
-  { label: "My Classes", value: 8 },
-  { label: "Total Students", value: 124 },
-  { label: "Pending Assignments", value: 5 },
 ];
 
 const todaysSchedule = [
@@ -36,6 +29,7 @@ interface DashboardClientProps {
 
 export default function DashboardClient({ user }: DashboardClientProps) {
   const [sidebarOpen, setSidebarOpen] = useState(true);
+  const coachLevels = user?.coachLevel?.split(";").filter(Boolean) ?? [];
 
   return (
     <div className="flex min-h-screen bg-[#F4F6FB]">
@@ -99,7 +93,7 @@ export default function DashboardClient({ user }: DashboardClientProps) {
             onClick={() => setSidebarOpen((prev) => !prev)}
             className="rounded-md p-1 text-gray-600 hover:bg-gray-100"
           >
-            {/* <Menu size={22} /> */}
+            {/* mobile menu toggle icon can go here */}
           </button>
 
           <div className="flex items-center gap-6">
@@ -111,10 +105,10 @@ export default function DashboardClient({ user }: DashboardClientProps) {
             </div>
             <div className="flex items-center gap-2">
               <span className="flex h-8 w-8 items-center justify-center rounded-full bg-blue-600 text-sm text-white">
-                {(user?.name ?? "C").charAt(0).toUpperCase()}
+                {(user?.userName ?? "C").charAt(0).toUpperCase()}
               </span>
               <span className="text-sm font-medium text-[#0B1730]">
-                {user?.role ?? "Coach"}
+                {user?.employeeType ?? "Coach"}
               </span>
               <ChevronDown size={16} className="text-gray-400" />
             </div>
@@ -123,23 +117,20 @@ export default function DashboardClient({ user }: DashboardClientProps) {
 
         <main className="mx-auto max-w-4xl px-8 py-10">
           <h1 className="text-2xl font-bold text-[#0B1730]">
-            Welcome{user?.name ? `, ${user.name}` : " Back"}!
+            Welcome{user?.userName ? `, ${user.userName}` : " Back"}!
           </h1>
           <p className="mt-1 text-sm text-gray-500">
             {user?.email ?? "coach@upstepacademy.com"}
           </p>
 
-          <div className="mt-8 grid grid-cols-3 gap-4">
-            {quickOverview.map((stat) => (
-              <div
-                key={stat.label}
-                className="rounded-xl bg-white p-5 text-center shadow-sm"
+          <div className="mt-4 flex flex-wrap gap-2">
+            {coachLevels.map((level) => (
+              <span
+                key={level}
+                className="rounded-full bg-blue-50 px-3 py-1 text-xs font-medium text-blue-700"
               >
-                <p className="text-2xl font-bold text-[#0B1730]">
-                  {stat.value}
-                </p>
-                <p className="mt-1 text-sm text-gray-500">{stat.label}</p>
-              </div>
+                {level}
+              </span>
             ))}
           </div>
 
