@@ -1,0 +1,42 @@
+@import "tailwindcss";
+
+/*
+  Design tokens — "control room" palette.
+  A near-black navy workspace with a single warm amber signal color,
+  a cool teal used only for live/status indicators, and a monospace
+  utility face reserved for system/log text (ties back to the idea
+  of a client talking to a live backend service).
+*/
+@theme {
+  --color-bg: #0b0f14;
+  --color-panel: #10151d;
+  --color-panel-2: #161d28;
+  --color-border: #222b39;
+  --color-foreground: #e7eaee;
+  --color-muted: #8a93a3;
+  --color-muted-2: #5b6577;
+  --color-accent: #f2a93b;
+  --color-accent-dim: #f2a93b26;
+  --color-signal: #4fd1c5;
+  --color-danger: #f2665b;
+
+  --font-display: var(--font-space-grotesk);
+  --font-sans: var(--font-inter);
+  --font-mono: var(--font-jetbrains-mono);
+}
+
+body {
+  background: var(--color-bg);
+  color: var(--color-foreground);
+}
+
+::selection {
+  background: var(--color-accent-dim);
+  color: var(--color-accent);
+}
+
+/* Subtle dot-grid texture used on panel backgrounds */
+.bg-dot-grid {
+  background-image: radial-gradient(var(--color-border) 1px, transparent 1px);
+  background-size: 22px 22px;
+}
