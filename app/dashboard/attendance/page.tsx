@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { Suspense, useEffect, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { AuthService } from '@/lib/services';
 import { Session } from '@/lib/types';
@@ -11,11 +11,11 @@ interface Student {
   status: 'Present' | 'Absent' | 'Late';
 }
 
-export default function AttendancePage() {
+function AttendancePageContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const sessionId = searchParams.get('sessionId');
-  
+
   const [session, setSession] = useState<Session | null>(null);
   const [students, setStudents] = useState<Student[]>([]);
   const [loading, setLoading] = useState(true);
@@ -48,13 +48,13 @@ export default function AttendancePage() {
 
       const sessions = await authService.getCoachSessions(userData.id);
       const foundSession = sessions.find(s => s.coachSessionId === sessionId);
-      
+
       if (!foundSession) {
         throw new Error('Session not found');
       }
 
       setSession(foundSession);
-      
+
       const studentsData: Student[] = (foundSession.students || []).map((student: any) => ({
         enrollmentId: student.enrollmentId || student.id || `student_${Math.random()}`,
         name: student.name || student.studentName || `Student ${Math.random().toString(36).substr(2, 4)}`,
@@ -62,7 +62,7 @@ export default function AttendancePage() {
       }));
 
       setStudents(studentsData);
-      
+
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to load session');
     } finally {
@@ -321,7 +321,7 @@ export default function AttendancePage() {
                   </button>
                 </div>
               </div>
-              
+
               <div className="overflow-x-auto">
                 <table className="min-w-full divide-y divide-gray-200">
                   <thead className="bg-gray-50">
@@ -340,16 +340,15 @@ export default function AttendancePage() {
                       </th>
                     </tr>
                   </thead>
-                  <tbody className="bg-white divide-y divide-gray-200">
+                  <tbody className="bg-white divide-y divide-gray-800">
                     {students.map((student) => (
                       <tr key={student.enrollmentId} className="hover:bg-gray-50 transition">
                         <td className="px-6 py-4 whitespace-nowrap">
                           <div className="flex items-center">
-                            <div className={`w-8 h-8 rounded-full flex items-center justify-center mr-3 ${
-                              student.status === 'Present' ? 'bg-green-100 text-green-600' :
-                              student.status === 'Late' ? 'bg-yellow-100 text-yellow-600' :
-                              'bg-red-100 text-red-600'
-                            }`}>
+                            <div className={`w-8 h-8 rounded-full flex items-center justify-center mr-3 ${student.status === 'Present' ? 'bg-green-100 text-green-600' :
+                                student.status === 'Late' ? 'bg-yellow-100 text-yellow-600' :
+                                  'bg-red-100 text-red-600'
+                              }`}>
                               <span className="font-medium text-sm">
                                 {student.name.charAt(0).toUpperCase()}
                               </span>
@@ -370,16 +369,14 @@ export default function AttendancePage() {
                             value={student.status}
                             onChange={(e) => handleStatusChange(
                               student.enrollmentId,
-                              e.target.value as 'Present' | 'Absent' | 'Late'
+                              e.target.value as 'Present' | 'Absent' 
                             )}
-                            className={`px-3 py-2 border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 ${
-                              student.status === 'Present' ? 'border-green-300 bg-green-50' :
-                              student.status === 'Late' ? 'border-yellow-300 bg-yellow-50' :
-                              'border-red-300 bg-red-50'
-                            }`}
+                            className={`px-3 py-2 border rounded-lg text-sm font-medium focus:outline-none focus:ring-2 focus:ring-blue-500 ${student.status === 'Present' ? 'border-green-300 bg-green-50 text-green-800' :
+                                student.status === 'Late' ? 'border-yellow-300 bg-yellow-50 text-yellow-800' :
+                                  'border-red-300 bg-red-50 text-red-800'
+                              }`}
                           >
                             <option value="Present">✅ Present</option>
-                            <option value="Late">⏰ Late</option>
                             <option value="Absent">❌ Absent</option>
                           </select>
                         </td>
@@ -400,11 +397,10 @@ export default function AttendancePage() {
               <button
                 onClick={handleSubmitAttendance}
                 disabled={submitting}
-                className={`px-8 py-2.5 rounded-lg text-white font-medium transition duration-200 ${
-                  submitting
+                className={`px-8 py-2.5 rounded-lg text-white font-medium transition duration-200 ${submitting
                     ? 'bg-gray-400 cursor-not-allowed'
                     : 'bg-blue-500 hover:bg-blue-600 shadow-sm hover:shadow'
-                }`}
+                  }`}
               >
                 {submitting ? (
                   <span className="flex items-center">
@@ -439,5 +435,23 @@ export default function AttendancePage() {
         )}
       </div>
     </div>
+  );
+}
+
+export default function AttendancePage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+        <div className="text-center">
+          <svg className="animate-spin h-12 w-12 text-blue-500 mx-auto" fill="none" viewBox="0 0 24 24">
+            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+          </svg>
+          <p className="mt-4 text-gray-600">Loading attendance data...</p>
+        </div>
+      </div>
+    }>
+      <AttendancePageContent />
+    </Suspense>
   );
 }
