@@ -1,4 +1,4 @@
-import { LoginCredentials, LoginResponse, UserData } from './types';
+import { LoginCredentials, LoginResponse, UserData, Session, MarkAttendanceRequest, MarkAttendanceResponse } from './types';
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000';
 
@@ -106,6 +106,74 @@ export class AuthService {
       return localStorage.getItem('auth_token');
     }
     return this.token;
+  }
+
+  // ✅ FIXED: Methods are now inside the class
+  async getCoachSessions(coachId: string): Promise<Session[]> {
+    try {
+      const token = this.getToken();
+      if (!token) {
+        throw new Error('Not authenticated');
+      }
+
+      console.log('Fetching sessions for coach:', coachId);
+
+      const response = await fetch(
+        `${API_BASE_URL}/api/coach/sessions?coachId=${coachId}`,
+        {
+          method: 'GET',
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json',
+          },
+        }
+      );
+
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.message || 'Failed to fetch sessions');
+      }
+
+      const data = await response.json();
+      return data.data || [];
+    } catch (error) {
+      console.error('Get sessions error:', error);
+      throw error;
+    }
+  }
+
+  async markAttendance(request: MarkAttendanceRequest): Promise<MarkAttendanceResponse> {
+    try {
+      const token = this.getToken();
+      if (!token) {
+        throw new Error('Not authenticated');
+      }
+
+      console.log('Marking attendance for session:', request.coachSessionId);
+
+      const response = await fetch(
+        `${API_BASE_URL}/api/coach/attendance`,
+        {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(request),
+        }
+      );
+
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.message || 'Failed to mark attendance');
+      }
+
+      const data = await response.json();
+      return data;
+    } catch (error) {
+      console.error('Mark attendance error:', error);
+      throw error;
+    }
   }
 }
 

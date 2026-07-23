@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 import { AuthService } from '@/lib/services';
 import { UserData } from '@/lib/types';
 
@@ -12,7 +13,6 @@ export default function DashboardPage() {
   const authService = AuthService.getInstance();
 
   useEffect(() => {
-    // Check authentication
     if (!authService.isAuthenticated()) {
       router.push('/login');
       return;
@@ -22,7 +22,6 @@ export default function DashboardPage() {
     if (data) {
       setUserData(data);
     } else {
-      // If no user data, redirect to login
       router.push('/login');
     }
     setLoading(false);
@@ -34,7 +33,6 @@ export default function DashboardPage() {
       router.push('/login');
     } catch (error) {
       console.error('Logout failed:', error);
-      // Force redirect even if logout fails
       router.push('/login');
     }
   };
@@ -69,7 +67,7 @@ export default function DashboardPage() {
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4" />
                 </svg>
               </div>
-              <span className="ml-2 text-xl font-bold text-gray-900">Dashboard</span>
+              <span className="ml-2 text-xl font-bold text-gray-900">Coach Dashboard</span>
             </div>
             <div className="flex items-center space-x-4">
               <span className="text-sm text-gray-600 hidden sm:block">{userData.email}</span>
@@ -89,7 +87,7 @@ export default function DashboardPage() {
         {/* Welcome Banner */}
         <div className="bg-gradient-to-r from-blue-500 to-indigo-600 rounded-2xl p-8 text-white mb-8">
           <h1 className="text-3xl font-bold mb-2">Welcome back, {userData.userName}!</h1>
-          <p className="text-blue-100">Here's your account overview and recent activity</p>
+          <p className="text-blue-100">Here's your account overview and quick actions</p>
         </div>
 
         {/* Stats Grid */}
@@ -100,7 +98,7 @@ export default function DashboardPage() {
                 <p className="text-sm text-gray-500 mb-1">User ID</p>
                 <p className="text-lg font-semibold text-gray-900">{userData.id}</p>
               </div>
-              <div className="w-12 h-12 bg-blue-50 rounded-full flex items-center justify-center">
+              <div className="w-12 mt-4 ml-2  h-12 bg-blue-50 rounded-full flex items-center justify-center">
                 <svg className="w-6 h-6 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
                 </svg>
@@ -153,7 +151,59 @@ export default function DashboardPage() {
           </div>
         </div>
 
-        {/* Additional Information */}
+        {/* Quick Actions - Prominent Cards */}
+        <div className="mb-8">
+          <h2 className="text-2xl font-bold text-gray-900 mb-4">Quick Actions</h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <Link 
+              href="/dashboard/sessions" 
+              className="bg-white rounded-xl p-8 shadow-sm border-2 border-blue-100 hover:border-blue-500 hover:shadow-lg transition-all duration-200 group"
+            >
+              <div className="flex items-start space-x-4">
+                <div className="w-16 h-16 bg-blue-50 rounded-xl flex items-center justify-center group-hover:bg-blue-100 transition">
+                  <svg className="w-8 h-8 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                  </svg>
+                </div>
+                <div className="flex-1">
+                  <h3 className="text-xl font-semibold text-gray-900 group-hover:text-blue-600 transition">My Sessions</h3>
+                  <p className="text-gray-500 mt-1">View and manage all your coaching sessions</p>
+                  <div className="mt-3 flex items-center text-blue-500 font-medium">
+                    View Sessions
+                    <svg className="w-4 h-4 ml-1 group-hover:translate-x-1 transition" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                    </svg>
+                  </div>
+                </div>
+              </div>
+            </Link>
+
+            <Link 
+              href="/dashboard/attendance" 
+              className="bg-white rounded-xl p-8 shadow-sm border-2 border-green-100 hover:border-green-500 hover:shadow-lg transition-all duration-200 group"
+            >
+              <div className="flex items-start space-x-4">
+                <div className="w-16 h-16 bg-green-50 rounded-xl flex items-center justify-center group-hover:bg-green-100 transition">
+                  <svg className="w-8 h-8 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                </div>
+                <div className="flex-1">
+                  <h3 className="text-xl font-semibold text-gray-900 group-hover:text-green-600 transition">Mark Attendance</h3>
+                  <p className="text-gray-500 mt-1">Mark attendance for your sessions quickly</p>
+                  <div className="mt-3 flex items-center text-green-500 font-medium">
+                    Mark Attendance
+                    <svg className="w-4 h-4 ml-1 group-hover:translate-x-1 transition" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                    </svg>
+                  </div>
+                </div>
+              </div>
+            </Link>
+          </div>
+        </div>
+
+        {/* Profile Information */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
             <h3 className="text-lg font-semibold text-gray-900 mb-4">Profile Information</h3>
@@ -195,7 +245,7 @@ export default function DashboardPage() {
                   <p className="text-sm text-gray-600">Login successful</p>
                 </div>
               </div>
-              
+
               <div className="flex items-center p-4 bg-blue-50 rounded-lg">
                 <div className="w-10 h-10 bg-blue-500 rounded-full flex items-center justify-center mr-3">
                   <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
