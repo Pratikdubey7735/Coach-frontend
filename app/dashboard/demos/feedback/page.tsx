@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { Suspense, useEffect, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { AuthService } from '@/lib/services';
 import { DemoAppointment } from '@/lib/types';
@@ -9,6 +9,14 @@ import {
 } from '@/lib/subLevels';
 
 export default function DemoFeedbackPage() {
+    return (
+        <Suspense fallback={null}>
+            <DemoFeedbackPageContent />
+        </Suspense>
+    );
+}
+
+function DemoFeedbackPageContent() {
     const router = useRouter();
     const searchParams = useSearchParams();
     const demoId = searchParams.get('demoId');
