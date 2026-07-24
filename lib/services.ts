@@ -1,4 +1,16 @@
-import { LoginCredentials, LoginResponse, UserData, Session, MarkAttendanceRequest, MarkAttendanceResponse } from './types';
+import { 
+  LoginCredentials, 
+  LoginResponse, 
+  UserData, 
+  Session, 
+  MarkAttendanceRequest, 
+  MarkAttendanceResponse,
+  DemoAppointment,
+  UpdateDemoStatusRequest,
+  UpdateDemoStatusResponse,
+  UpdateDemoFeedbackRequest,
+  UpdateDemoFeedbackResponse
+} from './types';
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000';
 
@@ -19,6 +31,7 @@ export class AuthService {
     return AuthService.instance;
   }
 
+  // ============= AUTH METHODS =============
   async login(credentials: LoginCredentials): Promise<UserData> {
     try {
       console.log('Attempting login to:', `${API_BASE_URL}/api/auth/login`);
@@ -108,7 +121,7 @@ export class AuthService {
     return this.token;
   }
 
-  // ✅ FIXED: Methods are now inside the class
+  // ============= SESSION METHODS =============
   async getCoachSessions(coachId: string): Promise<Session[]> {
     try {
       const token = this.getToken();
@@ -172,6 +185,141 @@ export class AuthService {
       return data;
     } catch (error) {
       console.error('Mark attendance error:', error);
+      throw error;
+    }
+  }
+
+  // ============= DEMO METHODS =============
+  async getCoachDemos(coachId: string): Promise<DemoAppointment[]> {
+    try {
+      const token = this.getToken();
+      if (!token) {
+        throw new Error('Not authenticated');
+      }
+
+      console.log('Fetching demos for coach:', coachId);
+
+      const response = await fetch(
+        `${API_BASE_URL}/api/coach/demos?coachId=${coachId}`,
+        {
+          method: 'GET',
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json',
+          },
+        }
+      );
+
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.message || 'Failed to fetch demos');
+      }
+
+      const data = await response.json();
+      return data.data || [];
+    } catch (error) {
+      console.error('Get demos error:', error);
+      throw error;
+    }
+  }
+
+  async getDemoById(demoId: string): Promise<DemoAppointment> {
+    try {
+      const token = this.getToken();
+      if (!token) {
+        throw new Error('Not authenticated');
+      }
+
+      console.log('Fetching demo by ID:', demoId);
+
+      const response = await fetch(
+        `${API_BASE_URL}/api/coach/demo/${demoId}`,
+        {
+          method: 'GET',
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json',
+          },
+        }
+      );
+
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.message || 'Failed to fetch demo');
+      }
+
+      const data = await response.json();
+      return data.data;
+    } catch (error) {
+      console.error('Get demo by ID error:', error);
+      throw error;
+    }
+  }
+
+  async updateDemoStatus(request: UpdateDemoStatusRequest): Promise<UpdateDemoStatusResponse> {
+    try {
+      const token = this.getToken();
+      if (!token) {
+        throw new Error('Not authenticated');
+      }
+
+      console.log('Updating demo status:', request);
+
+      const response = await fetch(
+        `${API_BASE_URL}/api/coach/demo/status`,
+        {
+          method: 'PATCH',
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(request),
+        }
+      );
+
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.message || 'Failed to update demo status');
+      }
+
+      const data = await response.json();
+      return data;
+    } catch (error) {
+      console.error('Update demo status error:', error);
+      throw error;
+    }
+  }
+
+  async updateDemoFeedback(request: UpdateDemoFeedbackRequest): Promise<UpdateDemoFeedbackResponse> {
+    try {
+      const token = this.getToken();
+      if (!token) {
+        throw new Error('Not authenticated');
+      }
+
+      console.log('Updating demo feedback:', request);
+
+      const response = await fetch(
+        `${API_BASE_URL}/api/coach/demo/feedback`,
+        {
+          method: 'PATCH',
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(request),
+        }
+      );
+
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.message || 'Failed to update demo feedback');
+      }
+
+      const data = await response.json();
+      return data;
+    } catch (error) {
+      console.error('Update demo feedback error:', error);
       throw error;
     }
   }

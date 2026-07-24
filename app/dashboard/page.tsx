@@ -155,8 +155,8 @@ export default function DashboardPage() {
         <div className="mb-8">
           <h2 className="text-2xl font-bold text-gray-900 mb-4">Quick Actions</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <Link 
-              href="/dashboard/sessions" 
+            <Link
+              href="/dashboard/sessions"
               className="bg-white rounded-xl p-8 shadow-sm border-2 border-blue-100 hover:border-blue-500 hover:shadow-lg transition-all duration-200 group"
             >
               <div className="flex items-start space-x-4">
@@ -178,8 +178,8 @@ export default function DashboardPage() {
               </div>
             </Link>
 
-            <Link 
-              href="/dashboard/attendance" 
+            <Link
+              href="/dashboard/attendance"
               className="bg-white rounded-xl p-8 shadow-sm border-2 border-green-100 hover:border-green-500 hover:shadow-lg transition-all duration-200 group"
             >
               <div className="flex items-start space-x-4">
@@ -193,6 +193,30 @@ export default function DashboardPage() {
                   <p className="text-gray-500 mt-1">Mark attendance for your sessions quickly</p>
                   <div className="mt-3 flex items-center text-green-500 font-medium">
                     Mark Attendance
+                    <svg className="w-4 h-4 ml-1 group-hover:translate-x-1 transition" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                    </svg>
+                  </div>
+                </div>
+              </div>
+            </Link>
+
+            {/* ✅ New Demos Card */}
+            <Link
+              href="/dashboard/demos"
+              className="bg-white rounded-xl p-8 shadow-sm border-2 border-purple-100 hover:border-purple-500 hover:shadow-lg transition-all duration-200 group"
+            >
+              <div className="flex items-start space-x-4">
+                <div className="w-16 h-16 bg-purple-50 rounded-xl flex items-center justify-center group-hover:bg-purple-100 transition">
+                  <svg className="w-8 h-8 text-purple-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                  </svg>
+                </div>
+                <div className="flex-1">
+                  <h3 className="text-xl font-semibold text-gray-900 group-hover:text-purple-600 transition">My Demos</h3>
+                  <p className="text-gray-500 mt-1">View and manage your demo appointments</p>
+                  <div className="mt-3 flex items-center text-purple-500 font-medium">
+                    View Demos
                     <svg className="w-4 h-4 ml-1 group-hover:translate-x-1 transition" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                     </svg>

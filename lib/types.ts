@@ -52,3 +52,50 @@ export interface MarkAttendanceResponse {
   message: string;
   data?: any;
 }
+
+export interface DemoLead {
+  Name: string;
+  MobilePhone: string | null;
+  Email: string;
+}
+
+export interface DemoAppointment {
+  Id: string;
+  Name: string;
+  Lead__c: string;
+  Lead__r: DemoLead;
+  IST_Demo_Date__c: string;
+  IST_Start_Time__c: string;
+  IST_End_Time__c: string;
+  Region__c: string;
+  Demo_Status__c: 'Demo Done' | 'Coach Assigned' | 'Scheduled' | 'Cancelled' | 'No Show';
+  Sub_Level__c?: string;
+  Remarks__c?: string;
+  Coach_User__c: string;
+}
+
+export interface UpdateDemoStatusRequest {
+  demoId: string;
+  status: string;
+  subLevel?: string;
+  remarks?: string;
+}
+
+export interface UpdateDemoStatusResponse {
+  success: boolean;
+  message: string;
+  data?: any;
+}
+
+export interface UpdateDemoFeedbackRequest {
+  demoId: string;
+  status: string;
+  subLevel?: string;
+  remarks?: string;
+}
+
+export interface UpdateDemoFeedbackResponse {
+  success: boolean;
+  message: string;
+  data?: any;
+}
