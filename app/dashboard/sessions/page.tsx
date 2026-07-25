@@ -433,11 +433,6 @@ export default function SessionsPage() {
                           : 'Mark Attendance'}
                       </button>
                     </div>
-                    {isFuture && (
-                      <p className="text-xs text-gray-400 mt-2 text-right">
-                        📅 Session is in the future
-                      </p>
-                    )}
                   </div>
                 </div>
               </div>
