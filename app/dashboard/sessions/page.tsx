@@ -66,6 +66,20 @@ export default function SessionsPage() {
     return sessionDate < now;
   };
 
+  // Helper function to check if a session is in the future
+  const isSessionFuture = (session: Session): boolean => {
+    if (!session.dateStr || !session.startTime) return false;
+    
+    // Combine date and time
+    const [year, month, day] = session.dateStr.split('-').map(Number);
+    const [hours, minutes] = session.startTime.split(':').map(Number);
+    
+    const sessionDate = new Date(year, month - 1, day, hours, minutes);
+    const now = new Date();
+    
+    return sessionDate > now;
+  };
+
   // Filter sessions
   useEffect(() => {
     let filtered = [...sessions];
@@ -212,7 +226,7 @@ export default function SessionsPage() {
         {/* Session Filters */}
         <div className="bg-white rounded-xl shadow-sm p-4 mb-6">
           <div className="flex flex-wrap gap-4 items-center">
-            {/* Mark Attendance Filter Button - Simple and clean */}
+            {/* Mark Attendance Filter Button */}
             <button
               onClick={handleTogglePendingPast}
               className={`px-4 py-2.5 rounded-lg text-sm font-medium transition-all duration-200 flex items-center gap-2 ${
@@ -327,7 +341,21 @@ export default function SessionsPage() {
         {/* Sessions Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {filteredSessions.map((session) => {
-            const isPendingPast = isSessionPast(session) && session.status?.toLowerCase() === 'planned';
+            const isPast = isSessionPast(session);
+            const isFuture = isSessionFuture(session);
+            const isPendingPast = isPast && session.status?.toLowerCase() === 'planned';
+            const isCompleted = session.status?.toLowerCase() === 'completed';
+            
+            // ✅ Disable button for future sessions OR completed sessions
+            const isDisabled = isCompleted || isFuture;
+            
+            // Show tooltip text based on why it's disabled
+            let disabledReason = '';
+            if (isCompleted) {
+              disabledReason = 'Session already completed';
+            } else if (isFuture) {
+              disabledReason = 'Cannot mark attendance for future sessions';
+            }
             
             return (
               <div
@@ -351,6 +379,11 @@ export default function SessionsPage() {
                         <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${getStatusColor(session.status)}`}>
                           {session.status || 'Unknown'}
                         </span>
+                        {isFuture && (
+                          <span className="px-2 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-500">
+                            ⏳ Future
+                          </span>
+                        )}
                       </div>
                     </div>
                   </div>
@@ -385,16 +418,26 @@ export default function SessionsPage() {
                       </span>
                       <button
                         onClick={() => handleMarkAttendance(session)}
-                        disabled={session.status?.toLowerCase() === 'completed'}
+                        disabled={isDisabled}
+                        title={disabledReason}
                         className={`px-4 py-2 rounded-lg text-sm font-medium transition duration-200 ${
-                          session.status?.toLowerCase() === 'completed'
+                          isDisabled
                             ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
                             : 'bg-blue-500 text-white hover:bg-blue-600 shadow-sm hover:shadow'
                         }`}
                       >
-                        {session.status?.toLowerCase() === 'completed' ? 'Completed' : 'Mark Attendance'}
+                        {isCompleted 
+                          ? 'Completed' 
+                          : isFuture 
+                          ? 'Upcoming' 
+                          : 'Mark Attendance'}
                       </button>
                     </div>
+                    {isFuture && (
+                      <p className="text-xs text-gray-400 mt-2 text-right">
+                        📅 Session is in the future
+                      </p>
+                    )}
                   </div>
                 </div>
               </div>
