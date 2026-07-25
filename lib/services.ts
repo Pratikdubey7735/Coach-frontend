@@ -1,15 +1,17 @@
-import { 
-  LoginCredentials, 
-  LoginResponse, 
-  UserData, 
-  Session, 
-  MarkAttendanceRequest, 
+import {
+  LoginCredentials,
+  LoginResponse,
+  UserData,
+  Session,
+  MarkAttendanceRequest,
   MarkAttendanceResponse,
   DemoAppointment,
   UpdateDemoStatusRequest,
   UpdateDemoStatusResponse,
   UpdateDemoFeedbackRequest,
-  UpdateDemoFeedbackResponse
+  UpdateDemoFeedbackResponse,
+  CreateFeedbackRequest,
+  CreateFeedbackResponse
 } from './types';
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000';
@@ -35,7 +37,7 @@ export class AuthService {
   async login(credentials: LoginCredentials): Promise<UserData> {
     try {
       console.log('Attempting login to:', `${API_BASE_URL}/api/auth/login`);
-      
+
       const response = await fetch(`${API_BASE_URL}/api/auth/login`, {
         method: 'POST',
         headers: {
@@ -252,6 +254,78 @@ export class AuthService {
       return data.data;
     } catch (error) {
       console.error('Get demo by ID error:', error);
+      throw error;
+    }
+  }
+
+  // Update the getCoachBatchesWithEnrollments method
+  async getCoachBatchesWithEnrollments(coachId: string): Promise<any> {
+    try {
+      const token = this.getToken();
+      if (!token) {
+        throw new Error('Not authenticated');
+      }
+
+      console.log('Fetching batches for coach:', coachId);
+
+      const response = await fetch(
+        `${API_BASE_URL}/api/coach/batches?coachId=${coachId}`,
+        {
+          method: 'GET',
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json',
+          },
+        }
+      );
+
+      if (!response.ok) {
+        const error = await response.json();
+        console.error('API Error Response:', error);
+        throw new Error(error.message || 'Failed to fetch batches');
+      }
+
+      const data = await response.json();
+      console.log('Raw API Response:', JSON.stringify(data, null, 2));
+
+      // ✅ Ensure we return the correct data structure
+      return data.data || { batches: [], enrollments: [] };
+    } catch (error) {
+      console.error('Get batches error:', error);
+      throw error;
+    }
+  }
+
+  async createFeedback(feedbackData: CreateFeedbackRequest): Promise<CreateFeedbackResponse> {
+    try {
+      const token = this.getToken();
+      if (!token) {
+        throw new Error('Not authenticated');
+      }
+
+      console.log('Creating feedback:', feedbackData);
+
+      const response = await fetch(
+        `${API_BASE_URL}/api/coach/feedback`,
+        {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(feedbackData),
+        }
+      );
+
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.message || 'Failed to create feedback');
+      }
+
+      const data = await response.json();
+      return data;
+    } catch (error) {
+      console.error('Create feedback error:', error);
       throw error;
     }
   }

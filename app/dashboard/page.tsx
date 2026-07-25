@@ -201,7 +201,7 @@ export default function DashboardPage() {
               </div>
             </Link>
 
-            {/* ✅ New Demos Card */}
+         
             <Link
               href="/dashboard/demos"
               className="bg-white rounded-xl p-8 shadow-sm border-2 border-purple-100 hover:border-purple-500 hover:shadow-lg transition-all duration-200 group"
@@ -217,6 +217,30 @@ export default function DashboardPage() {
                   <p className="text-gray-500 mt-1">View and manage your demo appointments</p>
                   <div className="mt-3 flex items-center text-purple-500 font-medium">
                     View Demos
+                    <svg className="w-4 h-4 ml-1 group-hover:translate-x-1 transition" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                    </svg>
+                  </div>
+                </div>
+              </div>
+            </Link>
+
+           
+            <Link
+              href="/dashboard/batches"
+              className="bg-white rounded-xl p-8 shadow-sm border-2 border-teal-100 hover:border-teal-500 hover:shadow-lg transition-all duration-200 group"
+            >
+              <div className="flex items-start space-x-4">
+                <div className="w-16 h-16 bg-teal-50 rounded-xl flex items-center justify-center group-hover:bg-teal-100 transition">
+                  <svg className="w-8 h-8 text-teal-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+                  </svg>
+                </div>
+                <div className="flex-1">
+                  <h3 className="text-xl font-semibold text-gray-900 group-hover:text-teal-600 transition">My Batches</h3>
+                  <p className="text-gray-500 mt-1">View batches and create student feedback</p>
+                  <div className="mt-3 flex items-center text-teal-500 font-medium">
+                    View Batches
                     <svg className="w-4 h-4 ml-1 group-hover:translate-x-1 transition" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                     </svg>

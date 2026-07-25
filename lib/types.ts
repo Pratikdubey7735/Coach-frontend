@@ -99,3 +99,39 @@ export interface UpdateDemoFeedbackResponse {
   message: string;
   data?: any;
 }
+
+export interface Batch {
+  Id: string;
+  Name: string;
+  Coach_User__c: string;
+  Start_Date__c: string;
+  End_Date__c: string;
+  Batch_Status__c: 'Active Batch' | 'Active' | 'Completed' | 'Scheduled' | 'Cancelled' | 'Inactive';
+  enrollments?: Enrollment[];
+}
+
+export interface Enrollment {
+  Id: string;
+  Student__c: string;
+  Student__r: {
+    Name: string;
+    Email?: string;
+  };
+  Batch__c: string;
+  Enrollment_Status__c: 'Active' | 'Completed' | 'Dropped' | 'Pending';
+  Level__c?: string;
+}
+
+
+export interface CreateFeedbackRequest {
+  Enrollment__c: string;
+  Level1__c: string;
+  Feedback_Status__c: 'Draft' | 'Submit for Approval' | 'Approved' | 'Rejected';
+  [key: string]: any; 
+}
+
+export interface CreateFeedbackResponse {
+  success: boolean;
+  message: string;
+  data?: any;
+}
