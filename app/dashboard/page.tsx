@@ -179,7 +179,7 @@ export default function DashboardPage() {
             </Link>
 
             <Link
-              href="/dashboard/attendance"
+              href="/dashboard/sessions?filter=pending-past"
               className="bg-white rounded-xl p-8 shadow-sm border-2 border-green-100 hover:border-green-500 hover:shadow-lg transition-all duration-200 group"
             >
               <div className="flex items-start space-x-4">
@@ -190,7 +190,7 @@ export default function DashboardPage() {
                 </div>
                 <div className="flex-1">
                   <h3 className="text-xl font-semibold text-gray-900 group-hover:text-green-600 transition">Mark Attendance</h3>
-                  <p className="text-gray-500 mt-1">Mark attendance for your sessions quickly</p>
+                  <p className="text-gray-500 mt-1">Mark attendance for sessions that need it</p>
                   <div className="mt-3 flex items-center text-green-500 font-medium">
                     Mark Attendance
                     <svg className="w-4 h-4 ml-1 group-hover:translate-x-1 transition" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -201,7 +201,7 @@ export default function DashboardPage() {
               </div>
             </Link>
 
-         
+
             <Link
               href="/dashboard/demos"
               className="bg-white rounded-xl p-8 shadow-sm border-2 border-purple-100 hover:border-purple-500 hover:shadow-lg transition-all duration-200 group"
@@ -225,7 +225,7 @@ export default function DashboardPage() {
               </div>
             </Link>
 
-           
+
             <Link
               href="/dashboard/batches"
               className="bg-white rounded-xl p-8 shadow-sm border-2 border-teal-100 hover:border-teal-500 hover:shadow-lg transition-all duration-200 group"
